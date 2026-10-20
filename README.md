@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.svg" alt="MicCam ENI" width="100%"></p>
+
 # MicCam ENI
 
 Gravador de vídeo Android com **ganho de microfone 1x-5x** e multiplas fontes de audio.
