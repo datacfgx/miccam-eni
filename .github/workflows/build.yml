@@ -1,0 +1,36 @@
+name: Build MicCam ENI
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Gradle 8.7
+        run: |
+          curl -sL -m 120 -o /tmp/g.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q /tmp/g.zip -d /tmp && /tmp/gradle-8.7/bin/gradle --version | head -6
+      - name: SDK 35
+        run: |
+          SM=$(find $ANDROID_HOME -name sdkmanager -type f 2>/dev/null | head -1)
+          yes | $SM --licenses > /dev/null 2>&1 || true
+          $SM "platforms;android-35" "build-tools;35.0.0" > /dev/null 2>&1 || true
+      - name: Build
+        run: |
+          /tmp/gradle-8.7/bin/gradle assembleDebug --no-daemon -q
+          ls -la app/build/outputs/apk/debug/
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: miccam-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+          if-no-files-found: error
